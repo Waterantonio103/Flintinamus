@@ -61,13 +61,23 @@ pub fn find_lines_individual(
     }
 
     if context_bool {
+        let lower = context.unwrap();
+        let upper = lower;
         let ranges = bingus(&matches, &all_lines, lower, upper)?;
-        for range in ranges {
-            all_lines.get(range);
-        }
-    }
+        dbg!(&ranges);
+        matches.clear();
 
-    Ok(matches)
+        for range in ranges {
+            let get = all_lines.get(range);
+            if let Some(slice_with_context) = get {
+                matches.extend(slice_with_context.iter().cloned());
+            };
+        }
+
+        return Ok(matches);
+    } else {
+        return Ok(matches);
+    }
 
 }
 
@@ -83,24 +93,26 @@ fn retrieve(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lo
         return Ok(Vec::new());
     }
 
-    const CLAMP_MIN: usize = usize::MIN + 1;
+    const CLAMP_MIN: usize = usize::MIN;
     let upper_plus_one = upper.saturating_add(1);
-    let Some(clamp_max) = all_lines.len().checked_sub(1).filter(|c| *c >= CLAMP_MIN) else {
+    let Some(clamp_max) = all_lines.len().checked_sub(1).filter(|c| *c >= CLAMP_MIN + 1) else {
         return Err(FileReadError::ShortSlice);
     };
     let mut result = Vec::new();
     for (index, _) in matches {
-        // let index = index - 1;
-        let start = index.saturating_sub(lower).clamp(CLAMP_MIN, clamp_max);
-        let end = index.saturating_add(upper_plus_one).clamp(CLAMP_MIN, clamp_max);
+        //use real_index if want actual index -- test first
+        let real_index = index.saturating_sub(1);
+        let start = real_index.saturating_sub(lower).clamp(CLAMP_MIN, clamp_max.saturating_add(1));
+        let end = real_index.saturating_add(upper_plus_one).clamp(CLAMP_MIN, clamp_max.saturating_add(1));
         result.push(start..end)
     }
 
     Ok(result)
 }
 
-fn bingus(matches: &Vec<(usize, String)>, slice: &Vec<(usize, String)>, lower: usize, upper: usize) -> Result<Vec<std::ops::Range<usize>>, FileReadError> {
-    let ranges = retrieve(matches, slice, lower, upper)?;
+fn bingus(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lower: usize, upper: usize) -> Result<Vec<std::ops::Range<usize>>, FileReadError> {
+    let ranges = retrieve(matches, all_lines, lower, upper)?;
+    dbg!(&ranges);
 
     let mut result = Vec::new();
     let mut iter = ranges.into_iter();
