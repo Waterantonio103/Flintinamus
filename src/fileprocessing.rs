@@ -26,21 +26,12 @@ pub fn find_lines_individual(
     let context_bool = context.is_some();
 
     let mut all_lines: Vec<(usize, String)> = Vec::new();
-    let mut lower: usize = usize::MIN;
-    let mut upper: usize = usize::MIN;
 
     for (line_number, line_result) in read_lines(file)? {
         let line = line_result?;
 
         //check this
         all_lines.push((line_number, line.clone()));
-
-        if context_bool {
-            lower = context.unwrap();
-            upper = context.unwrap();
-        }
-
-        let all_line_slice = &*all_lines;
 
         if max_count.is_some() && matches.len() == max_count.unwrap() {
             break;
@@ -77,6 +68,7 @@ pub fn find_lines_individual(
     }
 
     Ok(matches)
+
 }
 
 fn read_lines<P>(filename: P) -> io::Result<impl Iterator<Item = (usize, io::Result<String>)>>
