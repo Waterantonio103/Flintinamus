@@ -26,21 +26,12 @@ pub fn find_lines_individual(
     let context_bool = context.is_some();
 
     let mut all_lines: Vec<(usize, String)> = Vec::new();
-    let mut lower: usize = usize::MIN;
-    let mut upper: usize = usize::MIN;
 
     for (line_number, line_result) in read_lines(file)? {
         let line = line_result?;
 
         //check this
         all_lines.push((line_number, line.clone()));
-
-        if context_bool {
-            lower = context.unwrap();
-            upper = context.unwrap();
-        }
-
-        let all_line_slice = &*all_lines;
 
         if max_count.is_some() && matches.len() == max_count.unwrap() {
             break;
@@ -69,7 +60,17 @@ pub fn find_lines_individual(
         }
     }
 
+    if context_bool {
+        let lower = context.unwrap();
+        let upper = lower;
+
+        let r = bingus(&matches, &all_lines, lower, upper);
+    } else {
+
+    }
+    
     Ok(matches)
+
 }
 
 fn read_lines<P>(filename: P) -> io::Result<impl Iterator<Item = (usize, io::Result<String>)>>
@@ -94,8 +95,6 @@ fn retrieve(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lo
         // let index = index - 1;
         let start = index.saturating_sub(lower).clamp(CLAMP_MIN, clamp_max);
         let end = index.saturating_add(upper_plus_one).clamp(CLAMP_MIN, clamp_max);
-        // let start = index.checked_sub(lower).clamp(Some(usize::MIN + 1), Some(all_lines.len() - 1))?;
-        // let end = index.checked_add(upper + 1).clamp(Some(usize::MIN + 1), Some(all_lines.len() - 1))?;
         result.push(start..end)
     }
 

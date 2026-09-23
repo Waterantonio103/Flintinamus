@@ -50,7 +50,7 @@ pub struct Args {
     ///Print nothing if matched at least once
     pub quiet: bool,
     #[arg(long)]
-    ///Stop searching for patterns after a certain count
+    ///Lines to display before and after matched line
     pub context: Option<usize>,
     //
     
