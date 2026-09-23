@@ -69,6 +69,13 @@ pub fn find_lines_individual(
         }
     }
 
+    if context_bool {
+        let ranges = bingus(&matches, &all_lines, lower, upper)?;
+        for range in ranges {
+            all_lines.get(range);
+        }
+    }
+
     Ok(matches)
 }
 
@@ -94,8 +101,6 @@ fn retrieve(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lo
         // let index = index - 1;
         let start = index.saturating_sub(lower).clamp(CLAMP_MIN, clamp_max);
         let end = index.saturating_add(upper_plus_one).clamp(CLAMP_MIN, clamp_max);
-        // let start = index.checked_sub(lower).clamp(Some(usize::MIN + 1), Some(all_lines.len() - 1))?;
-        // let end = index.checked_add(upper + 1).clamp(Some(usize::MIN + 1), Some(all_lines.len() - 1))?;
         result.push(start..end)
     }
 
