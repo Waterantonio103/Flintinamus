@@ -26,26 +26,25 @@ pub fn find_lines_individual(
     let mut lower: usize = 0;
     let mut upper: usize = 0;
 
-    if context.is_some() {
+    if let Some(context) = context {
         match context {
-            Some(Context::Full(x)) => {
+            Context::Full(x) => {
                 context_bool = true;
                 lower = x;
                 upper = lower;
             },
-            Some(Context::Right(y)) => {
+            Context::Right(y) => {
                 context_bool = true;
                 lower = 0;
                 upper = y;
             },
-            Some(Context::Left(z)) => {
+            Context::Left(z) => {
                 context_bool = true;
                 lower = z;
                 upper = 0;
             },
-            None => {}
         }
-    }
+    };
 
     let mut matches = Vec::new();
 
