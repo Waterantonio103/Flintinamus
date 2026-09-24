@@ -37,7 +37,17 @@ fn main() -> Result<(), FileReadError> {
 fn run(args: &Args) -> Result<(), FileReadError> {
     let paths = &args.directory;
     let target = &args.target;
-    let context = Context::Full(args.context);
+
+    let context = if let Some(full) = args.context {
+        Some(Context::Full(full))
+    } else if let Some(right) = args.after_context {
+        Some(Context::Right(right))
+    } else if let Some(left) = args.before_context {
+        Some(Context::Left(left))
+    } else {
+        None
+    };
+    
 
     for path in paths {
         let result = recurse_files(path, args.recursive)?;
