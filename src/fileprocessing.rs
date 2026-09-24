@@ -7,6 +7,7 @@ use std::io::{self, BufRead};
 use std::collections::HashMap;
 use std::usize;
 
+use crate::args::Context;
 use crate::matching::{strict::{find_match_strict, not_matched_strict}, relaxed::{find_match, not_matched}};
 use crate::errors::{FileReadError};
 
@@ -18,12 +19,38 @@ pub fn find_lines_individual(
         only: bool, 
         invert: bool, 
         max_count: Option<usize>,
-        context: Option<usize>,
+        context: Context,
     ) -> Result<Vec<(usize, String)>, FileReadError> {
 
-    let mut matches = Vec::new();
+    let mut context_bool: bool = false;
+    let mut lower: usize;
+    let mut upper: usize;
 
-    let context_bool = context.is_some();
+    match context {
+        Context::Full(x) => {
+            if x.is_some() {
+                context_bool = true;
+            }
+            lower = x.unwrap();
+            upper = lower;
+        },
+        Context::Right(y) => {
+            if y.is_some() {
+                context_bool = true;
+            }
+            lower = 0;
+            upper = y.unwrap();
+        },
+        Context::Left(z) => {
+            if z.is_some() {
+                context_bool = true;
+            }
+            lower = z.unwrap();
+            upper = 0;
+        },
+    }
+
+    let mut matches = Vec::new();
 
     let mut all_lines: Vec<(usize, String)> = Vec::new();
 
@@ -61,8 +88,6 @@ pub fn find_lines_individual(
     }
 
     if context_bool {
-        let lower = context.unwrap();
-        let upper = lower;
         let ranges = bingus(&matches, &all_lines, lower, upper)?;
         dbg!(&ranges);
         matches.clear();

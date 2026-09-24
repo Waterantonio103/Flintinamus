@@ -52,8 +52,21 @@ pub struct Args {
     #[arg(long)]
     ///Lines to display before and after matched line
     pub context: Option<usize>,
+    #[arg(long)]
+    ///Lines to display before matched line
+    pub before_context: Option<usize>,
+    #[arg(long)]
+    ///Lines to display after matched line
+    pub after_context: Option<usize>,
     //
     
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Context {
+    Full(Option<usize>),
+    Right(Option<usize>),
+    Left(Option<usize>),
 }
 
 // can use conflicts_with = "other_tag_name" for tags that cant work together

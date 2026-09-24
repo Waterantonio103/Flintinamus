@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use rayon::prelude::*;
 
 use crate::{
-    args::Args, 
+    args::{Args, Context}, 
     help::help,
     filesearch::recurse_files,
     matching::{relaxed, strict},
@@ -37,6 +37,7 @@ fn main() -> Result<(), FileReadError> {
 fn run(args: &Args) -> Result<(), FileReadError> {
     let paths = &args.directory;
     let target = &args.target;
+    let context = Context::Full(args.context);
 
     for path in paths {
         let result = recurse_files(path, args.recursive)?;
@@ -51,7 +52,7 @@ fn run(args: &Args) -> Result<(), FileReadError> {
                     args.only, 
                     args.invert, 
                     args.max_count,
-                    args.context
+                    context,
                 )
                     .map(|matches| (file, matches))
             })
