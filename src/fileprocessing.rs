@@ -7,26 +7,21 @@ use std::io::{self, BufRead};
 use std::collections::HashMap;
 use std::usize;
 
-use crate::args::Context;
+use crate::args::{PossibleArgs ,Context};
 use crate::matching::{strict::{find_match_strict, not_matched_strict}, relaxed::{find_match, not_matched}};
 use crate::errors::{FileReadError};
 
 pub fn find_lines_individual(
         file: &PathBuf,
         target: &str,
-        whole: bool,
-        insensitive: bool, 
-        only: bool, 
-        invert: bool, 
-        max_count: Option<usize>,
-        context: Option<Context>,
+        args: PossibleArgs,
     ) -> Result<Vec<(usize, String)>, FileReadError> {
 
     let mut context_bool: bool = false;
     let mut lower: usize = 0;
     let mut upper: usize = 0;
 
-    if let Some(context) = context {
+    if let Some(context) = args.context {
         match context {
             Context::Full(x) => {
                 context_bool = true;
@@ -56,27 +51,27 @@ pub fn find_lines_individual(
         //check this
         all_lines.push((line_number, line.clone()));
 
-        if max_count.is_some() && matches.len() == max_count.unwrap() {
+        if args.max_count.is_some() && matches.len() == args.max_count.unwrap() {
             break;
         }
 
-        if whole {
-            if invert {
-                if let Some(found) = not_matched_strict(line, line_number, target, insensitive) {
+        if args.whole {
+            if args.invert {
+                if let Some(found) = not_matched_strict(line, line_number, target, args.insensitive) {
                     matches.push(found);
                 }
             } else {
-                if let Some(found) = find_match_strict(line, line_number, target, insensitive, only) {
+                if let Some(found) = find_match_strict(line, line_number, target, args.insensitive, args.only) {
                     matches.push(found);
                 }
             }
         } else {
-            if invert {
-                if let Some(found) = not_matched(line, line_number, target, insensitive) {
+            if args.invert {
+                if let Some(found) = not_matched(line, line_number, target, args.insensitive) {
                     matches.push(found);
                 }
             } else {
-                if let Some(found) = find_match(line, line_number, target, insensitive, only) {
+                if let Some(found) = find_match(line, line_number, target, args.insensitive, args.only) {
                     matches.push(found);
                 }
             }
@@ -151,7 +146,14 @@ fn bingus(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lowe
     Ok(result)
 }
 
-//find a way to get index in all_lines, then should be good with safe_retrieve, will just have to like build a new vec from all the returns
-//from the fn and collect
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//Look into merging , lower..upper+1 in pairs? figure out algo
+    #[test]
+    fn test_default_args() {
+        let arguments = PossibleArgs::default();
+        let result = find_lines_individual(&PathBuf::from("src/tests.txt"), "hello", arguments).unwrap();
+        assert_eq!(result, vec![(1 ,"hello".to_string()), (4, "archhellobabes".to_string()), (6, "wtfhello".to_string()), (9, "hello".to_string())]);
+    }
+}

@@ -63,6 +63,29 @@ pub struct Args {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub struct PossibleArgs {
+    pub whole: bool,
+    pub insensitive: bool, 
+    pub only: bool, 
+    pub invert: bool, 
+    pub max_count: Option<usize>,
+    pub context: Option<Context>,
+}
+
+impl Default for PossibleArgs {
+    fn default() -> Self {
+        Self { 
+            whole: false, 
+            insensitive: false, 
+            only: false, 
+            invert: false, 
+            max_count: None, 
+            context: None, 
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum Context {
     Full(usize),
     Right(usize),

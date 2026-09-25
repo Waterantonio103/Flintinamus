@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use rayon::prelude::*;
 
 use crate::{
-    args::{Args, Context}, 
+    args::{Args, PossibleArgs, Context}, 
     help::help,
     filesearch::recurse_files,
     matching::{relaxed, strict},
@@ -28,10 +28,7 @@ mod matching;
 
 fn main() -> Result<(), FileReadError> {
     let args = Args::parse();
-
-    run(&args);
-
-    Ok(())
+    run(&args)
 }
 
 fn run(args: &Args) -> Result<(), FileReadError> {
@@ -47,7 +44,16 @@ fn run(args: &Args) -> Result<(), FileReadError> {
     } else {
         None
     };
-    
+
+    let arguments = PossibleArgs {
+        whole: args.whole,
+        insensitive: args.insensitive,
+        only: args.only,
+        invert: args.invert,
+        max_count: args.max_count,
+        context: context,
+    };
+
 
     for path in paths {
         let result = recurse_files(path, args.recursive)?;
@@ -56,13 +62,8 @@ fn run(args: &Args) -> Result<(), FileReadError> {
             .map(|file| {
                 find_lines_individual(
                     file, 
-                    target.as_str(), 
-                    args.whole, 
-                    args.insensitive, 
-                    args.only, 
-                    args.invert, 
-                    args.max_count,
-                    context,
+                    target.as_str(),
+                    arguments,
                 )
                     .map(|matches| (file, matches))
             })
@@ -120,9 +121,4 @@ fn run(args: &Args) -> Result<(), FileReadError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test() {
-        let result = find_lines_individual(&PathBuf::from("src/tests.txt"), "hello", false, false, false, false, None, Context);
-    }
 }
