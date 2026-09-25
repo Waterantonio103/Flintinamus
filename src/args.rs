@@ -36,7 +36,7 @@ pub struct Args {
     pub count: bool,
     #[arg(short, long, default_value_t = false)]
     ///Return only matched pattern at line
-    pub only: bool,
+    pub only: bool, //This does not YET work with CONTEXT --> REMINDER, DO THAT
     #[arg(short = 'v', long, default_value_t = false, conflicts_with = "only")]
     ///Return lines not matched
     pub invert: bool,
@@ -49,13 +49,13 @@ pub struct Args {
     #[arg(short, long, default_value_t = false, conflicts_with_all = ["invert", "only", "line_numbers", "count", "files_with_matches", "files_without_matches"])]
     ///Print nothing if matched at least once
     pub quiet: bool,
-    #[arg(long)]
+    #[arg(long, conflicts_with_all = ["before_context", "after_context", "files_with_matches", "files_without_matches", "only", "invert"])]
     ///Lines to display before and after matched line
     pub context: Option<usize>,
-    #[arg(long)]
+    #[arg(long, conflicts_with_all = ["context", "after_context", "files_with_matches", "files_without_matches", "only", "invert"])]
     ///Lines to display before matched line
     pub before_context: Option<usize>,
-    #[arg(long)]
+    #[arg(long, conflicts_with_all = ["context", "before_context", "files_with_matches", "files_without_matches", "only", "invert"])]
     ///Lines to display after matched line
     pub after_context: Option<usize>,
     //
@@ -64,9 +64,9 @@ pub struct Args {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Context {
-    Full(Option<usize>),
-    Right(Option<usize>),
-    Left(Option<usize>),
+    Full(usize),
+    Right(usize),
+    Left(usize),
 }
 
 // can use conflicts_with = "other_tag_name" for tags that cant work together

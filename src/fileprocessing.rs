@@ -19,36 +19,32 @@ pub fn find_lines_individual(
         only: bool, 
         invert: bool, 
         max_count: Option<usize>,
-        context: Context,
+        context: Option<Context>,
     ) -> Result<Vec<(usize, String)>, FileReadError> {
 
     let mut context_bool: bool = false;
-    let mut lower: usize;
-    let mut upper: usize;
+    let mut lower: usize = 0;
+    let mut upper: usize = 0;
 
-    match context {
-        Context::Full(x) => {
-            if x.is_some() {
+    if let Some(context) = context {
+        match context {
+            Context::Full(x) => {
                 context_bool = true;
-            }
-            lower = x.unwrap();
-            upper = lower;
-        },
-        Context::Right(y) => {
-            if y.is_some() {
+                lower = x;
+                upper = lower;
+            },
+            Context::Right(y) => {
                 context_bool = true;
-            }
-            lower = 0;
-            upper = y.unwrap();
-        },
-        Context::Left(z) => {
-            if z.is_some() {
+                lower = 0;
+                upper = y;
+            },
+            Context::Left(z) => {
                 context_bool = true;
-            }
-            lower = z.unwrap();
-            upper = 0;
-        },
-    }
+                lower = z;
+                upper = 0;
+            },
+        }
+    };
 
     let mut matches = Vec::new();
 
@@ -89,7 +85,6 @@ pub fn find_lines_individual(
 
     if context_bool {
         let ranges = bingus(&matches, &all_lines, lower, upper)?;
-        dbg!(&ranges);
         matches.clear();
 
         for range in ranges {
@@ -137,7 +132,6 @@ fn retrieve(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lo
 
 fn bingus(matches: &Vec<(usize, String)>, all_lines: &Vec<(usize, String)>, lower: usize, upper: usize) -> Result<Vec<std::ops::Range<usize>>, FileReadError> {
     let ranges = retrieve(matches, all_lines, lower, upper)?;
-    dbg!(&ranges);
 
     let mut result = Vec::new();
     let mut iter = ranges.into_iter();
