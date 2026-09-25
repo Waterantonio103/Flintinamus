@@ -107,4 +107,12 @@ fn run(args: &Args) -> Result<(), FileReadError> {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
+    #[test]
+    fn test() {
+        let result = find_lines_individual(&PathBuf::from("src/tests.txt"), "hello", false, false, false, false, None, Context);
+    }
+}
