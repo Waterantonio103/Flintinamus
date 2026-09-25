@@ -85,6 +85,29 @@ impl Default for PossibleArgs {
     }
 }
 
+impl PossibleArgs {
+    pub fn all_only_args(count: usize) -> Self {
+        Self { 
+            whole: true, 
+            insensitive: true, 
+            only: true, 
+            invert: false, 
+            max_count: Some(count), 
+            context: None, 
+        }
+    }
+    pub fn all_invert_args(count: usize) -> Self {
+        Self { 
+            whole: true, 
+            insensitive: true, 
+            only: false, 
+            invert: true, 
+            max_count: Some(count), 
+            context: None, 
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Context {
     Full(usize),
