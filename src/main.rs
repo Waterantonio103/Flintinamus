@@ -27,14 +27,17 @@ mod fileprocessing;
 mod matching;
 
 fn main() -> Result<(), FileReadError> {
+    //parse arguments and hand off to run function
     let args = Args::parse();
     run(&args)
 }
 
 fn run(args: &Args) -> Result<(), FileReadError> {
+    //Purpose : extract path and pattern from command line, and run them through functions according to optional flags
     let paths = &args.directory;
     let target = &args.target;
 
+    //get context count from command
     let context = if let Some(full) = args.context {
         Some(Context::Full(full))
     } else if let Some(right) = args.after_context {
@@ -45,6 +48,7 @@ fn run(args: &Args) -> Result<(), FileReadError> {
         None
     };
 
+    //Grab extra flags
     let arguments = PossibleArgs {
         whole: args.whole,
         insensitive: args.insensitive,
@@ -54,10 +58,11 @@ fn run(args: &Args) -> Result<(), FileReadError> {
         context: context,
     };
 
-
+    //iterate through pathes (multiple pathes can be given at runtime -- each will be handled)
     for path in paths {
         let result = recurse_files(path, args.recursive)?;
         //think of handling empty file
+        //Using parallel iteration to handoff files and folders to threads
         let results = result.par_iter()
             .map(|file| {
                 find_lines_individual(

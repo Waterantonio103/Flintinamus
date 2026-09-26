@@ -62,6 +62,7 @@ pub struct Args {
     
 }
 
+//Grouping arguments for better readability
 #[derive(Debug, Clone, Copy)]
 pub struct PossibleArgs {
     pub whole: bool,
@@ -108,6 +109,7 @@ impl PossibleArgs {
     }
 }
 
+//enum to describe which context was chosen (before, after, or full)
 #[derive(Debug, Clone, Copy)]
 pub enum Context {
     Full(usize),
